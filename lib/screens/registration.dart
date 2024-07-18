@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 
@@ -35,6 +36,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  void _performRegistration() async {
+    // Simulate registration logic (replace with your actual logic)
+    String username = _usernameController.text;
+    String email = _emailController.text;
+    String name = _nameController.text;
+    String password = _passwordController.text;
+
+    // Store credentials in shared preferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', username);
+    await prefs.setString('email', email);
+    await prefs.setString('name', name);
+    await prefs.setString('password', password);
+
+    // Navigate to login screen after successful registration
+    Navigator.pushReplacementNamed(context, MyApp.loginRoute);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,10 +73,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Stack(
                   children: <Widget>[
                     Positioned(
-                      right: 0,  // Move `decor-1` to the right side
-                      top: 0,  // Align it to the top
-                      width: 400,  // Adjust width to your preference
-                      height: 300,  // Adjust height to your preference
+                      right: 0,
+                      top: 0,
+                      width: 400,
+                      height: 300,
                       child: FadeInUp(
                         duration: Duration(seconds: 1),
                         child: Container(
@@ -70,10 +89,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     Positioned(
-                      left: 0,  // Move `decor-2` to the left side
-                      bottom: 0,  // Align it to the bottom
-                      width: 200,  // Adjust width to your preference
-                      height: 200,  // Adjust height to your preference
+                      left: 0,
+                      bottom: 0,
+                      width: 200,
+                      height: 200,
                       child: FadeInUp(
                         duration: Duration(milliseconds: 1300),
                         child: Container(
@@ -89,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       left: 0,
                       top: 0,
                       width: 400,
-                      height:  400,
+                      height: 400,
                       child: FadeInUp(
                         duration: Duration(milliseconds: 1600),
                         child: Image.asset('assets/images/character-2.png'),
@@ -112,7 +131,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           margin: EdgeInsets.only(top: 50),
                           child: Center(
                             child: Text(
-                              "Register",
+                              "Welcome!",
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontSize: 40,
@@ -180,7 +199,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                               child: TextField(
-                                controller: _usernameController,
+                                controller: _emailController,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: "Email",
@@ -200,10 +219,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                               child: TextField(
-                                controller: _usernameController,
+                                controller: _nameController,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: "Name",
+                                  hintText: "Full Name",
                                   hintStyle: GoogleFonts.poppins(
                                     color: Colors.grey[700],
                                   ),
@@ -213,7 +232,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             Container(
                               padding: EdgeInsets.all(8.0),
                               child: TextField(
-                                controller: _usernameController,
+                                controller: _passwordController,
+                                obscureText: true,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: "Password",
@@ -227,7 +247,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 30,),
+                    SizedBox(height: 20),
                     FadeInUp(
                       duration: Duration(milliseconds: 1900),
                       child: Container(
@@ -243,8 +263,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(0, 0, 0, 0), // Transparent background for gradient
-                            shadowColor: Colors.transparent, // Remove shadow
+                            backgroundColor: const Color.fromARGB(0, 0, 0, 0),
+                            shadowColor: Colors.transparent,
                             minimumSize: Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -253,11 +273,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          onPressed: () {
-                            // Implement register logic here
-                            // For demonstration, navigate to login screen after register
-                            Navigator.pushReplacementNamed(context, MyApp.loginRoute);
-                          },
+                          onPressed: _performRegistration,
                           child: Text(
                             "Register",
                             style: GoogleFonts.poppins(

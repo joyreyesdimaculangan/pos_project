@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 
@@ -14,6 +15,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   late TextEditingController _usernameController;
   late TextEditingController _passwordController;
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -27,6 +29,27 @@ class _LoginScreenState extends State<LoginScreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _performLogin() async {
+    // Simulate login validation (replace with your actual logic)
+    String username = _usernameController.text;
+    String password = _passwordController.text;
+
+    // Retrieve stored credentials from shared preferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedUsername = prefs.getString('username');
+    String? storedPassword = prefs.getString('password');
+
+    if (username == storedUsername && password == storedPassword) {
+      // Navigate to main screen or perform other actions upon successful login
+      Navigator.pushReplacementNamed(context, MyApp.mainRoute);
+    } else {
+      // Handle failed login attempt
+      setState(() {
+        _errorMessage = 'Invalid username or password. Please try again.';
+      });
+    }
   }
 
   @override
@@ -48,10 +71,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Stack(
                   children: <Widget>[
                     Positioned(
-                      right: 0,  // Move `decor-1` to the right side
-                      top: 0,  // Align it to the top
-                      width: 400,  // Adjust width to your preference
-                      height: 300,  // Adjust height to your preference
+                      right: 0,
+                      top: 0,
+                      width: 400,
+                      height: 300,
                       child: FadeInUp(
                         duration: Duration(seconds: 1),
                         child: Container(
@@ -64,10 +87,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     Positioned(
-                      left: 0,  // Move `decor-2` to the left side
-                      bottom: 0,  // Align it to the bottom
-                      width: 200,  // Adjust width to your preference
-                      height: 200,  // Adjust height to your preference
+                      left: 0,
+                      bottom: 0,
+                      width: 200,
+                      height: 200,
                       child: FadeInUp(
                         duration: Duration(milliseconds: 1300),
                         child: Container(
@@ -79,12 +102,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    // Add new characters from the image
                     Positioned(
                       left: 0,
                       top: 0,
                       width: 400,
-                      height:  400,
+                      height: 400,
                       child: FadeInUp(
                         duration: Duration(milliseconds: 1600),
                         child: Image.asset('assets/images/character-2.png'),
@@ -183,7 +205,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 30,),
+                    if (_errorMessage.isNotEmpty)
+                      SizedBox(height: 20),
+                      Text(
+                        _errorMessage,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    SizedBox(height: 20),
                     FadeInUp(
                       duration: Duration(milliseconds: 1900),
                       child: Container(
@@ -199,8 +227,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(0, 0, 0, 0), // Transparent background for gradient
-                            shadowColor: Colors.transparent, // Remove shadow
+                            backgroundColor: const Color.fromARGB(0, 0, 0, 0),
+                            shadowColor: Colors.transparent,
                             minimumSize: Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -209,11 +237,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          onPressed: () {
-                            // Implement login logic here
-                            // For demonstration, navigate to main screen after login
-                            Navigator.pushReplacementNamed(context, MyApp.mainRoute);
-                          },
+                          onPressed: _performLogin,
                           child: Text(
                             "Login",
                             style: GoogleFonts.poppins(
