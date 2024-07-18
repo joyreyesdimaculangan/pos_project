@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 
@@ -14,10 +13,14 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   late TextEditingController _usernameController;
   late TextEditingController _passwordController;
+<<<<<<< HEAD
   String _errorMessage = '';
   bool _isHoveringButton = false; // State variable for login button hover
   bool _isHoveringRegister = false; // State variable for register text hover
   bool _showPassword = false; // State variable to toggle password visibility
+=======
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Step 1: Define GlobalKey
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
 
   @override
   void initState() {
@@ -33,6 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+<<<<<<< HEAD
   void _performLogin() async {
     // Simulate login validation (replace with your actual logic)
     String username = _usernameController.text;
@@ -54,6 +58,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+=======
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
   // Validation function for the username or email field
   String? _validateUsernameOrEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -208,6 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
                       ),
+<<<<<<< HEAD
                     ),
                     if (_errorMessage.isNotEmpty) ...[
                       SizedBox(height: 20),
@@ -229,6 +236,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         });
                       },
                       child: Container(
+=======
+                      SizedBox(height: 20),
+                      TextFormField( // Step 3: Add TextFormField for password
+                        controller: _passwordController,
+                        validator: _validatePassword, // Validation function
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Password',
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -238,14 +259,29 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
+<<<<<<< HEAD
                             foregroundColor: _isHoveringButton ? Colors.green : Colors.white,
                             backgroundColor: _isHoveringButton ? Colors.white : Color(0xDB3CB607),
+=======
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
                             minimumSize: Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
+<<<<<<< HEAD
                           onPressed: _performLogin,
+=======
+                          onPressed: () {
+                            // Validate form on button press
+                            if (_formKey.currentState!.validate()) {
+                              // If form is valid, proceed with login logic
+                              Navigator.pushReplacementNamed(context, MyApp.mainRoute);
+                            }
+                          },
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
                           child: Text(
                             "Login",
                             style: GoogleFonts.poppins(

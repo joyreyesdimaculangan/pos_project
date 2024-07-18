@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../main.dart';
 import 'onboarding_page.dart';
@@ -47,7 +46,7 @@ class _IntroScreenState extends State<IntroScreen> {
                 children: [
                   OnboardingPage(
                     title: 'Sales Stats',
-                    description: 'Your tagline goes here',
+                    description: 'Where you can track your sales everywhere!',
                     imagePath: 'assets/images/logo.png',
                   ),
                   OnboardingPage(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 
@@ -16,12 +15,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late TextEditingController _emailController;
   late TextEditingController _nameController;
   late TextEditingController _passwordController;
+<<<<<<< HEAD
   late TextEditingController _confirmPasswordController;
   String _errorMessage = '';
   bool _isHoveringButton = false; // State variable for register button hover
   bool _isHoveringLogin = false; // State variable for login text hover
   bool _showPassword = false; // State variable to toggle password visibility
   bool _showConfirmPassword = false; // State variable to toggle confirm password visibility
+=======
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); 
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
 
   @override
   void initState() {
@@ -43,6 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+<<<<<<< HEAD
   void _performRegistration() async {
     String username = _usernameController.text;
     String email = _emailController.text;
@@ -87,6 +91,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     // Navigate to login screen after successful registration
     Navigator.pushReplacementNamed(context, MyApp.loginRoute);
+=======
+  // Validation function for the form fields
+  String? _validateUsername(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Username is required';
+    }
+    return null;
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
   }
 
   bool _validateInputs() {
@@ -108,7 +120,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Password must be at least 8 characters long and contain a mix of uppercase, lowercase, and digits
     String pattern = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
     RegExp regex = RegExp(pattern);
+<<<<<<< HEAD
     return regex.hasMatch(password);
+=======
+    if (!regex.hasMatch(value)) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Name is required';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    return null;
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
   }
 
   @override
@@ -137,9 +170,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Stack(
                   children: <Widget>[
                     Positioned(
+<<<<<<< HEAD
                       right: 0,
                       top: 0,
                       width: 400,
+=======
+                      right: 10,
+                      top: 0,
+                      width: 300,
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
                       height: 300,
                       child: Container(
                         decoration: BoxDecoration(
@@ -196,6 +235,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               Padding(
                 padding: EdgeInsets.all(30.0),
+<<<<<<< HEAD
                 child: Column(
                   children: <Widget>[
                     TextFormField(
@@ -348,6 +388,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         });
                       },
                       child: Container(
+=======
+                child: Form( // Step 2: Wrap with Form widget
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      TextFormField( // Step 3: Add TextFormField for username
+                        controller: _usernameController,
+                        validator: _validateUsername, // Validation function
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Username',
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField( // Step 3: Add TextFormField for email
+                        controller: _emailController,
+                        validator: _validateEmail, // Validation function
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Email',
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField( // Step 3: Add TextFormField for name
+                        controller: _nameController,
+                        validator: _validateName, // Validation function
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Name',
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField( // Step 3: Add TextFormField for password
+                        controller: _passwordController,
+                        validator: _validatePassword, // Validation function
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Password',
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -357,14 +441,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
+<<<<<<< HEAD
                             foregroundColor: _isHoveringButton ? Colors.green : Colors.white,
                             backgroundColor: _isHoveringButton ? Color.fromARGB(255, 255, 255, 255) : Color(0xDB3CB607),
+=======
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
                             minimumSize: Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
+<<<<<<< HEAD
                           onPressed: _performRegistration,
+=======
+                          onPressed: () {
+                            // Validate form on button press
+                            if (_formKey.currentState!.validate()) {
+                              // If form is valid, proceed with register logic
+                              Navigator.pushReplacementNamed(context, MyApp.loginRoute);
+                            }
+                          },
+>>>>>>> ccde5af43a84e91d9e374ba15ee71744fdad544e
                           child: Text(
                             "Register",
                             style: GoogleFonts.poppins(
