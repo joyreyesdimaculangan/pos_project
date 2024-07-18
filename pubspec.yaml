@@ -66,6 +66,10 @@ flutter:
     - assets/images/character-1.png
     - assets/images/character-2.png
     - assets/images/character-3.png
+    - assets/images/logo.png
+    - assets/images/analysis.png
+    - assets/images/get_started.png
+    - assets/images/sales.png
 
   
 

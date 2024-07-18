@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,6 +16,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late TextEditingController _emailController;
   late TextEditingController _nameController;
   late TextEditingController _passwordController;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Step 1: Define GlobalKey
 
   @override
   void initState() {
@@ -36,6 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+<<<<<<< HEAD
   void _performRegistration() async {
     // Simulate registration logic (replace with your actual logic)
     String username = _usernameController.text;
@@ -52,27 +53,69 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     // Navigate to login screen after successful registration
     Navigator.pushReplacementNamed(context, MyApp.loginRoute);
+=======
+  // Validation function for the form fields
+  String? _validateUsername(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Username is required';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email is required';
+    }
+    // Regular expression for email validation
+    String pattern =
+        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'; // RFC 2822 compliant regex
+    RegExp regex = RegExp(pattern);
+    if (!regex.hasMatch(value)) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Name is required';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    return null;
+>>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
+      backgroundColor: Colors.transparent,
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color.fromARGB(219, 219, 255, 204),
+              Color.fromRGBO(253, 255, 237, 0.893),
+            ],
+          ),
+        ),
+        child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
               Container(
                 height: 400,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/bg.png'),
-                    fit: BoxFit.fill,
-                  ),
-                ),
                 child: Stack(
                   children: <Widget>[
                     Positioned(
+<<<<<<< HEAD
                       right: 0,
                       top: 0,
                       width: 400,
@@ -84,6 +127,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             image: DecorationImage(
                               image: AssetImage('assets/images/decor-1.png'),
                             ),
+=======
+                      right: 10,
+                      top: 0,
+                      width: 300,
+                      height: 300,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/images/decor-1.png'),
+>>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                           ),
                         ),
                       ),
@@ -93,6 +146,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       bottom: 0,
                       width: 200,
                       height: 200,
+<<<<<<< HEAD
                       child: FadeInUp(
                         duration: Duration(milliseconds: 1300),
                         child: Container(
@@ -100,6 +154,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             image: DecorationImage(
                               image: AssetImage('assets/images/decor-2.png'),
                             ),
+=======
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/images/decor-2.png'),
+>>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                           ),
                         ),
                       ),
@@ -109,22 +169,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       top: 0,
                       width: 400,
                       height: 400,
+<<<<<<< HEAD
                       child: FadeInUp(
                         duration: Duration(milliseconds: 1600),
                         child: Image.asset('assets/images/character-2.png'),
                       ),
+=======
+                      child: Image.asset('assets/images/character-2.png'),
+>>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                     ),
                     Positioned(
                       right: 0,
                       bottom: 0,
                       width: 300,
-                      height: 400,
-                      child: FadeInUp(
-                        duration: Duration(milliseconds: 1600),
-                        child: Image.asset('assets/images/character-3.png'),
-                      ),
+                      height: 500,
+                      child: Image.asset('assets/images/character-1.png'),
                     ),
                     Positioned(
+<<<<<<< HEAD
                       child: FadeInUp(
                         duration: Duration(milliseconds: 1600),
                         child: Container(
@@ -137,6 +199,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 fontSize: 40,
                                 fontWeight: FontWeight.bold,
                               ),
+=======
+                      child: Container(
+                        margin: EdgeInsets.only(top: 50),
+                        child: Center(
+                          child: Text(
+                            "Register",
+                            style: GoogleFonts.poppins(
+                              color: Colors.green,
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+>>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                             ),
                           ),
                         ),
@@ -147,6 +220,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               Padding(
                 padding: EdgeInsets.all(30.0),
+<<<<<<< HEAD
                 child: Column(
                   children: <Widget>[
                     FadeInUp(
@@ -251,6 +325,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     FadeInUp(
                       duration: Duration(milliseconds: 1900),
                       child: Container(
+=======
+                child: Form( // Step 2: Wrap with Form widget
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      TextFormField( // Step 3: Add TextFormField for username
+                        controller: _usernameController,
+                        validator: _validateUsername, // Validation function
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Username',
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField( // Step 3: Add TextFormField for email
+                        controller: _emailController,
+                        validator: _validateEmail, // Validation function
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Email',
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField( // Step 3: Add TextFormField for name
+                        controller: _nameController,
+                        validator: _validateName, // Validation function
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Name',
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField( // Step 3: Add TextFormField for password
+                        controller: _passwordController,
+                        validator: _validatePassword, // Validation function
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Password',
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+>>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -263,17 +381,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
+<<<<<<< HEAD
                             backgroundColor: const Color.fromARGB(0, 0, 0, 0),
+=======
+                            backgroundColor: Colors.transparent,
+>>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                             shadowColor: Colors.transparent,
                             minimumSize: Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            textStyle: GoogleFonts.poppins(
-                              fontWeight: FontWeight.bold,
-                            ),
                           ),
+<<<<<<< HEAD
                           onPressed: _performRegistration,
+=======
+                          onPressed: () {
+                            // Validate form on button press
+                            if (_formKey.currentState!.validate()) {
+                              // If form is valid, proceed with register logic
+                              Navigator.pushReplacementNamed(context, MyApp.loginRoute);
+                            }
+                          },
+>>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                           child: Text(
                             "Register",
                             style: GoogleFonts.poppins(
@@ -283,11 +412,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 30,),
-                    FadeInUp(
-                      duration: Duration(milliseconds: 2000),
-                      child: GestureDetector(
+                      SizedBox(height: 20),
+                      GestureDetector(
                         onTap: () {
                           // Navigate to the login screen
                           Navigator.pushNamed(context, MyApp.loginRoute);
@@ -301,8 +427,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
