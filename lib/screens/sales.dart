@@ -25,6 +25,8 @@ class SalesScreen extends StatefulWidget {
 class _SalesScreenState extends State<SalesScreen> {
   late List<SalesTransaction> filteredTransactions;
   late Map<String, double> totalSales;
+  late DateTime startDate;
+  late DateTime endDate;
 
   // Example list of sales transactions
   final List<SalesTransaction> salesTransactions = [
@@ -155,6 +157,8 @@ class _SalesScreenState extends State<SalesScreen> {
     super.initState();
     filteredTransactions = salesTransactions;
     calculateTotalSales();
+    startDate = DateTime.now().subtract(Duration(days: 7));
+    endDate = DateTime.now();
   }
 
   // Calculate total sales per transaction
@@ -166,17 +170,22 @@ class _SalesScreenState extends State<SalesScreen> {
     });
   }
 
-  // Method to filter transactions based on search query
+  // Method to filter transactions based on date range
+  void filterTransactionsByDateRange(DateTime start, DateTime end) {
+    setState(() {
+      filteredTransactions = salesTransactions.where((transaction) {
+        DateTime transactionDate = DateTime.parse(transaction.date);
+        return transactionDate.isAfter(start.subtract(Duration(days: 1))) &&
+            transactionDate.isBefore(end.add(Duration(days: 1)));
+      }).toList();
+    });
+  }
+
+  // Method to filter transactions by search query
   void filterTransactions(String query) {
     setState(() {
-      if (query.isEmpty) {
-        filteredTransactions = salesTransactions;
-      } else {
-        filteredTransactions = salesTransactions
-            .where((transaction) =>
-                transaction.productName.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
+      filteredTransactions = salesTransactions.where((transaction) =>
+          transaction.productName.toLowerCase().contains(query.toLowerCase())).toList();
     });
   }
 
@@ -196,6 +205,34 @@ class _SalesScreenState extends State<SalesScreen> {
               if (result != null && result.isNotEmpty) {
                 filterTransactions(result);
               }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.filter_list),
+            onPressed: () async {
+              await showDateRangePicker(
+                context: context,
+                firstDate: DateTime(2020),
+                lastDate: DateTime.now(),
+                initialDateRange: DateTimeRange(start: startDate, end: endDate),
+                builder: (BuildContext context, Widget? child) {
+                  return Theme(
+                    data: ThemeData(
+                      primarySwatch: Colors.green, // Customize your primary color here
+                      // Optionally, customize other aspects like text styles
+                    ),
+                    child: child!,
+                  );
+                },
+              ).then((dateRange) {
+                if (dateRange != null) {
+                  setState(() {
+                    startDate = dateRange.start;
+                    endDate = dateRange.end;
+                  });
+                  filterTransactionsByDateRange(startDate, endDate);
+                }
+              });
             },
           ),
         ],
@@ -296,12 +333,11 @@ class SalesTransactionSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    final List<SalesTransaction> suggestionList = query.isEmpty
-        ? transactions
-        : transactions
-            .where((transaction) =>
-                transaction.productName.toLowerCase().contains(query.toLowerCase()))
-            .toList();
+    final suggestionList = query.isEmpty
+        ? []
+        : transactions.where((transaction) {
+            return transaction.productName.toLowerCase().contains(query.toLowerCase());
+          }).toList();
 
     return ListView.builder(
       itemCount: suggestionList.length,
@@ -313,6 +349,114 @@ class SalesTransactionSearchDelegate extends SearchDelegate<String> {
           },
         );
       },
+    );
+  }
+}
+
+// Filter transactions by date range dialog
+class DateRangePickerDialog extends StatelessWidget {
+  final DateTime initialStartDate;
+  final DateTime initialEndDate;
+  final Function(DateTime, DateTime) onDateRangeSelected;
+
+  DateRangePickerDialog({
+    required this.initialStartDate,
+    required this.initialEndDate,
+    required this.onDateRangeSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    DateTime? startDate = initialStartDate;
+    DateTime? endDate = initialEndDate;
+
+    return AlertDialog(
+      title: Text('Select Date Range'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Start Date:'),
+          SizedBox(height: 8),
+          InkWell(
+            onTap: () async {
+              final pickedStartDate = await showDatePicker(
+                context: context,
+                initialDate: startDate!,
+                firstDate: DateTime(2020),
+                lastDate: DateTime.now(),
+                builder: (BuildContext context, Widget? child) {
+                  return Theme(
+                    data: ThemeData(
+                      primarySwatch: Colors.green, // Customize your primary color here
+                      // Optionally, customize other aspects like text styles
+                    ),
+                    child: child!,
+                  );
+                },
+              );
+              if (pickedStartDate != null) {
+                startDate = pickedStartDate;
+              }
+            },
+            child: InputDecorator(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: startDate != null ? startDate.toString() : 'Select start date',
+              ),
+              child: Text(startDate != null ? startDate!.toString() : ''),
+            ),
+          ),
+          SizedBox(height: 16),
+          Text('End Date:'),
+          SizedBox(height: 8),
+          InkWell(
+            onTap: () async {
+              final pickedEndDate = await showDatePicker(
+                context: context,
+                initialDate: endDate!,
+                firstDate: DateTime(2020),
+                lastDate: DateTime.now(),
+                builder: (BuildContext context, Widget? child) {
+                  return Theme(
+                    data: ThemeData(
+                      primarySwatch: Colors.green, // Customize your primary color here
+                      // Optionally, customize other aspects like text styles
+                    ),
+                    child: child!,
+                  );
+                },
+              );
+              if (pickedEndDate != null) {
+                endDate = pickedEndDate;
+              }
+            },
+            child: InputDecorator(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: endDate != null ? endDate.toString() : 'Select end date',
+              ),
+              child: Text(endDate != null ? endDate!.toString() : ''),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            if (startDate != null && endDate != null) {
+              onDateRangeSelected(startDate!, endDate!);
+              Navigator.of(context).pop();
+            }
+          },
+          child: Text('Apply'),
+        ),
+      ],
     );
   }
 }
