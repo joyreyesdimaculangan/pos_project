@@ -1,17 +1,318 @@
 import 'package:flutter/material.dart';
 
-class SalesScreen extends StatelessWidget {
-  const SalesScreen({super.key});
+// Define a class to represent a sales transaction
+class SalesTransaction {
+  final String date;
+  final String time;
+  final String productName;
+  final double price;
+
+  SalesTransaction({
+    required this.date,
+    required this.time,
+    required this.productName,
+    required this.price,
+  });
+}
+
+class SalesScreen extends StatefulWidget {
+  SalesScreen({Key? key}) : super(key: key);
+
+  @override
+  _SalesScreenState createState() => _SalesScreenState();
+}
+
+class _SalesScreenState extends State<SalesScreen> {
+  late List<SalesTransaction> filteredTransactions;
+  late Map<String, double> totalSales;
+
+  // Example list of sales transactions
+  final List<SalesTransaction> salesTransactions = [
+    SalesTransaction(
+      date: '2024-07-18',
+      time: '10:00 AM',
+      productName: 'Product A',
+      price: 100.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-18',
+      time: '11:30 AM',
+      productName: 'Product B',
+      price: 150.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-18',
+      time: '1:00 PM',
+      productName: 'Product C',
+      price: 120.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-18',
+      time: '3:30 PM',
+      productName: 'Product D',
+      price: 90.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-18',
+      time: '5:00 PM',
+      productName: 'Product E',
+      price: 180.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-19',
+      time: '9:00 AM',
+      productName: 'Product F',
+      price: 130.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-19',
+      time: '10:30 AM',
+      productName: 'Product G',
+      price: 110.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-19',
+      time: '12:00 PM',
+      productName: 'Product H',
+      price: 95.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-19',
+      time: '2:30 PM',
+      productName: 'Product I',
+      price: 210.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-19',
+      time: '4:00 PM',
+      productName: 'Product J',
+      price: 70.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-20',
+      time: '11:00 AM',
+      productName: 'Product K',
+      price: 125.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-20',
+      time: '1:30 PM',
+      productName: 'Product L',
+      price: 155.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-20',
+      time: '3:00 PM',
+      productName: 'Product M',
+      price: 85.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-20',
+      time: '5:30 PM',
+      productName: 'Product N',
+      price: 145.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-21',
+      time: '10:00 AM',
+      productName: 'Product O',
+      price: 115.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-21',
+      time: '12:30 PM',
+      productName: 'Product P',
+      price: 190.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-21',
+      time: '2:00 PM',
+      productName: 'Product Q',
+      price: 105.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-21',
+      time: '4:30 PM',
+      productName: 'Product R',
+      price: 225.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-22',
+      time: '9:30 AM',
+      productName: 'Product S',
+      price: 140.0,
+    ),
+    SalesTransaction(
+      date: '2024-07-22',
+      time: '11:00 AM',
+      productName: 'Product T',
+      price: 175.0,
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    filteredTransactions = salesTransactions;
+    calculateTotalSales();
+  }
+
+  // Calculate total sales per transaction
+  void calculateTotalSales() {
+    totalSales = {};
+    salesTransactions.forEach((transaction) {
+      totalSales[transaction.date] =
+          (totalSales[transaction.date] ?? 0) + transaction.price;
+    });
+  }
+
+  // Method to filter transactions based on search query
+  void filterTransactions(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredTransactions = salesTransactions;
+      } else {
+        filteredTransactions = salesTransactions
+            .where((transaction) =>
+                transaction.productName.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sales'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () async {
+              final String? result = await showSearch(
+                context: context,
+                delegate: SalesTransactionSearchDelegate(salesTransactions),
+              );
+              if (result != null && result.isNotEmpty) {
+                filterTransactions(result);
+              }
+            },
+          ),
+        ],
       ),
-      body: const Center(
-        child: Text('Sales Screen'),
+      body: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: DataTable(
+              headingRowHeight: 40,
+              dataRowHeight: 60,
+              dividerThickness: 1,
+              columnSpacing: 16,
+              columns: const [
+                DataColumn(
+                  label: Text(
+                    'Date',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Time',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Product',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Price',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Total Sales',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                  ),
+                ),
+              ],
+              rows: filteredTransactions.map((transaction) {
+                return DataRow(
+                  cells: [
+                    DataCell(Text(transaction.date)),
+                    DataCell(Text(transaction.time)),
+                    DataCell(Text(transaction.productName)),
+                    DataCell(Text('\$${transaction.price.toStringAsFixed(2)}')),
+                    DataCell(Text('\$${totalSales[transaction.date]!.toStringAsFixed(2)}')),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        ),
       ),
+    );
+  }
+}
+
+// Search delegate for handling search actions
+class SalesTransactionSearchDelegate extends SearchDelegate<String> {
+  final List<SalesTransaction> transactions;
+
+  SalesTransactionSearchDelegate(this.transactions);
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, '');
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return Container(); // Build your search results here if needed
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final List<SalesTransaction> suggestionList = query.isEmpty
+        ? transactions
+        : transactions
+            .where((transaction) =>
+                transaction.productName.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+
+    return ListView.builder(
+      itemCount: suggestionList.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(suggestionList[index].productName),
+          onTap: () {
+            close(context, suggestionList[index].productName);
+          },
+        );
+      },
     );
   }
 }
