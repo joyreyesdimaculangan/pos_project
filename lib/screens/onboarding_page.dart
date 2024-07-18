@@ -25,15 +25,15 @@ class OnboardingPage extends StatelessWidget {
               textStyle: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.green, // Text color in green
+                color: Colors.green, 
               ),
             ),
           ),
           SizedBox(height: 20),
           Image.asset(
             imagePath,
-            width: 300, // Enlarged image width
-            height: 300, // Enlarged image height
+            width: 300, 
+            height: 300, 
           ),
           SizedBox(height: 10),
           Text(
@@ -42,7 +42,7 @@ class OnboardingPage extends StatelessWidget {
             style: GoogleFonts.poppins(
               textStyle: TextStyle(
                 fontSize: 16,
-                color: Colors.green, // Text color in green
+                color: Colors.green, 
               ),
             ),
           ),

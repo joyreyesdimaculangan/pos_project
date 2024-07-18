@@ -14,11 +14,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   late TextEditingController _usernameController;
   late TextEditingController _passwordController;
-<<<<<<< HEAD
-  String _errorMessage = '';
-=======
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Step 1: Define GlobalKey
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
 
   @override
   void initState() {
@@ -34,27 +30,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-<<<<<<< HEAD
-  void _performLogin() async {
-    // Simulate login validation (replace with your actual logic)
-    String username = _usernameController.text;
-    String password = _passwordController.text;
-
-    // Retrieve stored credentials from shared preferences
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? storedUsername = prefs.getString('username');
-    String? storedPassword = prefs.getString('password');
-
-    if (username == storedUsername && password == storedPassword) {
-      // Navigate to main screen or perform other actions upon successful login
-      Navigator.pushReplacementNamed(context, MyApp.mainRoute);
-    } else {
-      // Handle failed login attempt
-      setState(() {
-        _errorMessage = 'Invalid username or password. Please try again.';
-      });
-    }
-=======
   // Validation function for the username or email field
   String? _validateUsernameOrEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -76,7 +51,6 @@ class _LoginScreenState extends State<LoginScreen> {
       return 'Password is required';
     }
     return null;
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
   }
 
   @override
@@ -109,20 +83,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       top: 0,
                       width: 400,
                       height: 300,
-<<<<<<< HEAD
-                      child: FadeInUp(
-                        duration: Duration(seconds: 1),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/images/decor-1.png'),
-                            ),
-=======
                       child: Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: AssetImage('assets/images/decor-1.png'),
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                           ),
                         ),
                       ),
@@ -132,20 +96,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       bottom: 0,
                       width: 200,
                       height: 200,
-<<<<<<< HEAD
-                      child: FadeInUp(
-                        duration: Duration(milliseconds: 1300),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/images/decor-2.png'),
-                            ),
-=======
                       child: Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: AssetImage('assets/images/decor-2.png'),
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                           ),
                         ),
                       ),
@@ -155,14 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       top: 0,
                       width: 400,
                       height: 400,
-<<<<<<< HEAD
-                      child: FadeInUp(
-                        duration: Duration(milliseconds: 1600),
-                        child: Image.asset('assets/images/character-2.png'),
-                      ),
-=======
                       child: Image.asset('assets/images/character-2.png'),
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                     ),
                     Positioned(
                       right: 0,
@@ -203,19 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           labelText: 'Email or Phone number',
                         ),
                       ),
-<<<<<<< HEAD
-                    ),
-                    if (_errorMessage.isNotEmpty)
-                      SizedBox(height: 20),
-                      Text(
-                        _errorMessage,
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    SizedBox(height: 20),
-                    FadeInUp(
-                      duration: Duration(milliseconds: 1900),
-                      child: Container(
-=======
                       SizedBox(height: 20),
                       TextFormField( // Step 3: Add TextFormField for password
                         controller: _passwordController,
@@ -228,7 +162,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: 20),
                       Container(
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -241,20 +174,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-<<<<<<< HEAD
-                            backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-=======
                             backgroundColor: Colors.transparent,
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                             shadowColor: Colors.transparent,
                             minimumSize: Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-<<<<<<< HEAD
-                          onPressed: _performLogin,
-=======
                           onPressed: () {
                             // Validate form on button press
                             if (_formKey.currentState!.validate()) {
@@ -262,7 +188,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               Navigator.pushReplacementNamed(context, MyApp.mainRoute);
                             }
                           },
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                           child: Text(
                             "Login",
                             style: GoogleFonts.poppins(

@@ -6,11 +6,29 @@ import '../main.dart';
 class MyWidget extends StatelessWidget {
   const MyWidget({Key? key}) : super(key: key);
 
+  // Example list of products
+  final List<Product> products = const [
+    Product(
+      name: 'Product 1',
+      description: 'Description of Product 1',
+      image: 'assets/product1.jpg',
+    ),
+    Product(
+      name: 'Product 2',
+      description: 'Description of Product 2',
+      image: 'assets/product2.jpg',
+    ),
+    // Add more products as needed
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Components', style: GoogleFonts.poppins()),
+        title: Text(
+          'Home Page',
+          style: GoogleFonts.poppins(color: Colors.black),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -20,7 +38,11 @@ class MyWidget extends StatelessWidget {
             Text(
               'Overview',
               style: GoogleFonts.poppins(
-                textStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                textStyle: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
               ),
             ),
             SizedBox(height: 16),
@@ -35,15 +57,19 @@ class MyWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Dashboard',
+                            'Transactions',
                             style: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              textStyle: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
                             ),
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Overview of the system performance and statistics.',
-                            style: GoogleFonts.poppins(),
+                            '1,2324',
+                            style: GoogleFonts.poppins(color: Colors.black),
                           ),
                         ],
                       ),
@@ -62,13 +88,17 @@ class MyWidget extends StatelessWidget {
                           Text(
                             'Sales',
                             style: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              textStyle: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
                             ),
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Overview of recent transactions and sales data.',
-                            style: GoogleFonts.poppins(),
+                            '15,242',
+                            style: GoogleFonts.poppins(color: Colors.black),
                           ),
                         ],
                       ),
@@ -89,15 +119,34 @@ class MyWidget extends StatelessWidget {
                       Text(
                         'Products',
                         style: GoogleFonts.poppins(
-                          textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          textStyle: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
                         ),
                       ),
                       SizedBox(height: 8),
-                      Text(
-                        'Overview of products available in the inventory.',
-                        style: GoogleFonts.poppins(),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: products.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              leading: CircleAvatar(
+                                backgroundImage: AssetImage(products[index].image),
+                              ),
+                              title: Text(
+                                products[index].name,
+                                style: GoogleFonts.poppins(color: Colors.black),
+                              ),
+                              subtitle: Text(
+                                products[index].description,
+                                style: GoogleFonts.poppins(color: Colors.black),
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                      // Add more detailed product overview here
                     ],
                   ),
                 ),
@@ -130,21 +179,21 @@ class MyWidget extends StatelessWidget {
               ),
             ),
             ListTile(
-              title: Text('Dashboard', style: GoogleFonts.poppins()),
+              title: Text('Dashboard', style: GoogleFonts.poppins(color: Colors.black)),
               leading: const Icon(Icons.dashboard),
               onTap: () {
                 Navigator.pushNamed(context, MyApp.dashboardRoute);
               },
             ),
             ListTile(
-              title: Text('Sales', style: GoogleFonts.poppins()),
+              title: Text('Sales', style: GoogleFonts.poppins(color: Colors.black)),
               leading: const Icon(Icons.attach_money),
               onTap: () {
                 Navigator.pushNamed(context, MyApp.salesRoute);
               },
             ),
             ListTile(
-              title: Text('Products', style: GoogleFonts.poppins()),
+              title: Text('Products', style: GoogleFonts.poppins(color: Colors.black)),
               leading: const Icon(Icons.shopping_bag),
               onTap: () {
                 Navigator.pushNamed(context, MyApp.productsRoute);
@@ -152,14 +201,14 @@ class MyWidget extends StatelessWidget {
             ),
             const Divider(),
             ListTile(
-              title: Text('Account', style: GoogleFonts.poppins()),
+              title: Text('Account', style: GoogleFonts.poppins(color: Colors.black)),
               leading: const Icon(Icons.people),
               onTap: () {
                 Navigator.pushNamed(context, MyApp.accountRoute);
               },
             ),
             ListTile(
-              title: Text('Logout', style: GoogleFonts.poppins()),
+              title: Text('Logout', style: GoogleFonts.poppins(color: Colors.black)),
               leading: const Icon(Icons.logout),
               onTap: () {
                 Navigator.pushReplacementNamed(context, MyApp.loginRoute);
@@ -170,4 +219,16 @@ class MyWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+class Product {
+  final String name;
+  final String description;
+  final String image;
+
+  const Product({
+    required this.name,
+    required this.description,
+    required this.image,
+  });
 }

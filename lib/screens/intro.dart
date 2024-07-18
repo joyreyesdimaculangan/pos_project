@@ -47,7 +47,7 @@ class _IntroScreenState extends State<IntroScreen> {
                 children: [
                   OnboardingPage(
                     title: 'Sales Stats',
-                    description: 'Your tagline goes here',
+                    description: 'Where you can track your sales everywhere!',
                     imagePath: 'assets/images/logo.png',
                   ),
                   OnboardingPage(
