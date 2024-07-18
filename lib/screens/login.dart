@@ -14,11 +14,10 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   late TextEditingController _usernameController;
   late TextEditingController _passwordController;
-<<<<<<< HEAD
   String _errorMessage = '';
-=======
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Step 1: Define GlobalKey
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
+  bool _isHoveringButton = false; // State variable for login button hover
+  bool _isHoveringRegister = false; // State variable for register text hover
+  bool _showPassword = false; // State variable to toggle password visibility
 
   @override
   void initState() {
@@ -34,7 +33,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-<<<<<<< HEAD
   void _performLogin() async {
     // Simulate login validation (replace with your actual logic)
     String username = _usernameController.text;
@@ -54,7 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
         _errorMessage = 'Invalid username or password. Please try again.';
       });
     }
-=======
+  }
+
   // Validation function for the username or email field
   String? _validateUsernameOrEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -76,7 +75,6 @@ class _LoginScreenState extends State<LoginScreen> {
       return 'Password is required';
     }
     return null;
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
   }
 
   @override
@@ -90,8 +88,8 @@ class _LoginScreenState extends State<LoginScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color.fromARGB(219, 219, 255, 204),
-              Color.fromRGBO(253, 255, 237, 0.893),
+              Color.fromARGB(255, 255, 255, 255),
+              Color.fromRGBO(255, 255, 255, 0.886),
             ],
           ),
         ),
@@ -109,20 +107,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       top: 0,
                       width: 400,
                       height: 300,
-<<<<<<< HEAD
-                      child: FadeInUp(
-                        duration: Duration(seconds: 1),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/images/decor-1.png'),
-                            ),
-=======
                       child: Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: AssetImage('assets/images/decor-1.png'),
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                           ),
                         ),
                       ),
@@ -132,20 +120,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       bottom: 0,
                       width: 200,
                       height: 200,
-<<<<<<< HEAD
-                      child: FadeInUp(
-                        duration: Duration(milliseconds: 1300),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/images/decor-2.png'),
-                            ),
-=======
                       child: Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: AssetImage('assets/images/decor-2.png'),
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                           ),
                         ),
                       ),
@@ -155,14 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       top: 0,
                       width: 400,
                       height: 400,
-<<<<<<< HEAD
-                      child: FadeInUp(
-                        duration: Duration(milliseconds: 1600),
-                        child: Image.asset('assets/images/character-2.png'),
-                      ),
-=======
                       child: Image.asset('assets/images/character-2.png'),
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                     ),
                     Positioned(
                       right: 0,
@@ -191,104 +162,126 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               Padding(
                 padding: EdgeInsets.all(30.0),
-                child: Form( // Step 2: Wrap with Form widget
-                  key: _formKey,
-                  child: Column(
-                    children: <Widget>[
-                      TextFormField( // Step 3: Add TextFormField for username/email
-                        controller: _usernameController,
-                        validator: _validateUsernameOrEmail, // Validation function
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Email or Phone number',
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                      controller: _usernameController,
+                      validator: _validateUsernameOrEmail,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.green),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.green.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.green),
+                        ),
+                        labelText: 'Email or Username',
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      controller: _passwordController,
+                      validator: _validatePassword,
+                      obscureText: !_showPassword, // Toggle password visibility
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.green),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.green.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.green),
+                        ),
+                        labelText: 'Password',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _showPassword ? Icons.visibility : Icons.visibility_off,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _showPassword = !_showPassword;
+                            });
+                          },
                         ),
                       ),
-<<<<<<< HEAD
                     ),
-                    if (_errorMessage.isNotEmpty)
+                    if (_errorMessage.isNotEmpty) ...[
                       SizedBox(height: 20),
                       Text(
                         _errorMessage,
                         style: TextStyle(color: Colors.red),
                       ),
+                    ],
                     SizedBox(height: 20),
-                    FadeInUp(
-                      duration: Duration(milliseconds: 1900),
+                    MouseRegion(
+                      onEnter: (_) {
+                        setState(() {
+                          _isHoveringButton = true;
+                        });
+                      },
+                      onExit: (_) {
+                        setState(() {
+                          _isHoveringButton = false;
+                        });
+                      },
                       child: Container(
-=======
-                      SizedBox(height: 20),
-                      TextFormField( // Step 3: Add TextFormField for password
-                        controller: _passwordController,
-                        validator: _validatePassword, // Validation function
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Password',
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Container(
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xDB3CB607),
-                              Color.fromRGBO(84, 179, 44, 0.525),
-                            ],
+                          border: Border.all(
+                            color: _isHoveringButton ? Colors.green : Colors.transparent,
                           ),
                         ),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-<<<<<<< HEAD
-                            backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-=======
-                            backgroundColor: Colors.transparent,
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
-                            shadowColor: Colors.transparent,
+                            foregroundColor: _isHoveringButton ? Colors.green : Colors.white,
+                            backgroundColor: _isHoveringButton ? Colors.white : Color(0xDB3CB607),
                             minimumSize: Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-<<<<<<< HEAD
                           onPressed: _performLogin,
-=======
-                          onPressed: () {
-                            // Validate form on button press
-                            if (_formKey.currentState!.validate()) {
-                              // If form is valid, proceed with login logic
-                              Navigator.pushReplacementNamed(context, MyApp.mainRoute);
-                            }
-                          },
->>>>>>> 393f8b137c276157a009ad9cda342fc2dc02bd38
                           child: Text(
                             "Login",
                             style: GoogleFonts.poppins(
-                              color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () {
-                          // Navigate to the registration screen
-                          Navigator.pushNamed(context, MyApp.registerRoute);
+                    ),
+                    SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, MyApp.registerRoute);
+                      },
+                      child: MouseRegion(
+                        onEnter: (_) {
+                          setState(() {
+                            _isHoveringRegister = true;
+                          });
+                        },
+                        onExit: (_) {
+                          setState(() {
+                            _isHoveringRegister = false;
+                          });
                         },
                         child: Text(
                           "Don't have an account? Register here",
                           style: GoogleFonts.poppins(
-                            color: Color.fromRGBO(50, 115, 22, 0.522),
+                            color: _isHoveringRegister ? Colors.green : Color.fromRGBO(50, 115, 22, 0.522),
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ],
