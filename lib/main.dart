@@ -8,6 +8,7 @@ import 'screens/sales.dart';
 import 'screens/products.dart';
 import 'screens/account.dart';
 import 'screens/home.dart';
+import 'screens/intro.dart'; 
 
 void main() {
   runApp(const MyApp());
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   // Define constant route names
+  static const String introRoute = '/intro'; 
   static const String loginRoute = '/login';
   static const String registerRoute = '/register';
   static const String mainRoute = '/main';
@@ -29,20 +31,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: loginRoute, // Set initial route to login
+      initialRoute: introRoute, 
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme(
           Theme.of(context).textTheme.apply(bodyColor: Colors.black, displayColor: Colors.black),
         ),
       ),
       routes: {
+        introRoute: (context) => IntroScreen(), 
         loginRoute: (context) => const LoginScreen(),
         registerRoute: (context) => const RegisterScreen(),
-        mainRoute: (context) => const MyWidget(), // Main app screen after login
-        dashboardRoute: (context) => DashboardScreen(), // Remove 'const' if no const constructor
-        salesRoute: (context) => SalesScreen(), // Remove 'const' if no const constructor
-        productsRoute: (context) => ProductsScreen(), // Remove 'const' if no const constructor
-        accountRoute: (context) => AccountScreen(), // Remove 'const' if no const constructor
+        mainRoute: (context) => const MyWidget(), 
+        dashboardRoute: (context) => DashboardScreen(),
+        salesRoute: (context) => SalesScreen(),
+        productsRoute: (context) => ProductsScreen(),
+        accountRoute: (context) => AccountScreen(),
       },
       onGenerateRoute: (settings) {
         // Handle logout route
@@ -54,6 +57,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-
