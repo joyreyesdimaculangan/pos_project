@@ -1,25 +1,40 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../main.dart';
+import 'products.dart'; // Ensure this import is correct
 
-class MyWidget extends StatelessWidget {
+class MyWidget extends StatefulWidget {
   const MyWidget({Key? key}) : super(key: key);
 
-  // Example list of products
-  final List<Product> products = const [
-    Product(
-      name: 'Product 1',
-      description: 'Description of Product 1',
-      image: 'assets/product1.jpg',
-    ),
-    Product(
-      name: 'Product 2',
-      description: 'Description of Product 2',
-      image: 'assets/product2.jpg',
-    ),
-    // Add more products as needed
-  ];
+  @override
+  _MyWidgetState createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<MyWidget> {
+  String _userName = 'Juan dela Cruz';
+  String _avatarUrl = 'assets/default_avatar.png';
+  List<Products> products = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userName = prefs.getString('name') ?? 'Juan dela Cruz';
+      _avatarUrl = prefs.getString('avatarUrl') ?? 'assets/default_avatar.png';
+      List<String>? productJsonList = prefs.getStringList('products');
+      if (productJsonList != null) {
+        products = Products.listFromJson(productJsonList);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +44,7 @@ class MyWidget extends StatelessWidget {
           'Home Page',
           style: GoogleFonts.poppins(color: Colors.black),
         ),
+        backgroundColor: Color.fromRGBO(84, 179, 44, 0.525),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -133,14 +149,19 @@ class MyWidget extends StatelessWidget {
                           itemBuilder: (context, index) {
                             return ListTile(
                               leading: CircleAvatar(
-                                backgroundImage: AssetImage(products[index].image),
+                                backgroundImage: products[index].picture.isNotEmpty
+                                    ? NetworkImage(products[index].picture)
+                                    : null,
+                                child: products[index].picture.isEmpty
+                                    ? Icon(Icons.shopping_bag)
+                                    : null,
                               ),
                               title: Text(
                                 products[index].name,
                                 style: GoogleFonts.poppins(color: Colors.black),
                               ),
                               subtitle: Text(
-                                products[index].description,
+                                '\$${products[index].price.toStringAsFixed(2)}',
                                 style: GoogleFonts.poppins(color: Colors.black),
                               ),
                             );
@@ -159,7 +180,7 @@ class MyWidget extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            const DrawerHeader(
+            DrawerHeader(
               decoration: BoxDecoration(
                 color: Color.fromRGBO(84, 179, 44, 0.525),
               ),
@@ -167,51 +188,77 @@ class MyWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   CircleAvatar(
+                    backgroundImage: AssetImage(_avatarUrl),
                     radius: 30,
-                    backgroundImage: AssetImage('assets/image.jpg'),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 8),
                   Text(
-                    'Juan dela Cruz',
-                    style: TextStyle(fontSize: 25, color: Colors.white),
+                    _userName,
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
             ListTile(
-              title: Text('Dashboard', style: GoogleFonts.poppins(color: Colors.black)),
+              title: Text(
+                'Dashboard',
+                style: GoogleFonts.poppins(color: Colors.black),
+              ),
               leading: const Icon(Icons.dashboard),
               onTap: () {
-                Navigator.pushNamed(context, MyApp.dashboardRoute);
+                Navigator.pushReplacementNamed(context, '/dashboard');
               },
             ),
             ListTile(
-              title: Text('Sales', style: GoogleFonts.poppins(color: Colors.black)),
+              title: Text(
+                'Sales',
+                style: GoogleFonts.poppins(color: Colors.black),
+              ),
               leading: const Icon(Icons.attach_money),
               onTap: () {
-                Navigator.pushNamed(context, MyApp.salesRoute);
+                Navigator.pushReplacementNamed(context, '/sales');
               },
             ),
             ListTile(
-              title: Text('Products', style: GoogleFonts.poppins(color: Colors.black)),
+              title: Text(
+                'Products',
+                style: GoogleFonts.poppins(color: Colors.black),
+              ),
               leading: const Icon(Icons.shopping_bag),
               onTap: () {
-                Navigator.pushNamed(context, MyApp.productsRoute);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductsScreen(
+                      onProductsChanged: _fetchUserData, // Pass callback to refresh data
+                    ),
+                  ),
+                );
               },
             ),
-            const Divider(),
             ListTile(
-              title: Text('Account', style: GoogleFonts.poppins(color: Colors.black)),
+              title: Text(
+                'Account',
+                style: GoogleFonts.poppins(color: Colors.black),
+              ),
               leading: const Icon(Icons.people),
               onTap: () {
-                Navigator.pushNamed(context, MyApp.accountRoute);
+                Navigator.pushReplacementNamed(context, '/account');
               },
             ),
             ListTile(
-              title: Text('Logout', style: GoogleFonts.poppins(color: Colors.black)),
+              title: Text(
+                'Logout',
+                style: GoogleFonts.poppins(color: Colors.black),
+              ),
               leading: const Icon(Icons.logout),
               onTap: () {
-                Navigator.pushReplacementNamed(context, MyApp.loginRoute);
+                Navigator.pushReplacementNamed(context, '/logout');
               },
             ),
           ],
@@ -221,14 +268,29 @@ class MyWidget extends StatelessWidget {
   }
 }
 
-class Product {
+class Products {
   final String name;
-  final String description;
-  final String image;
+  final double price;
+  final String picture;
 
-  const Product({
-    required this.name,
-    required this.description,
-    required this.image,
-  });
+  Products({required this.name, required this.price, this.picture = ''});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'price': price,
+      'picture': picture,
+    };
+  }
+
+  static List<Products> listFromJson(List<String> jsonList) {
+    return jsonList.map((json) {
+      Map<String, dynamic> data = jsonDecode(json);
+      return Products(
+        name: data['name'],
+        price: data['price'],
+        picture: data['picture'],
+      );
+    }).toList();
+  }
 }

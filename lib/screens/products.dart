@@ -1,23 +1,24 @@
-import 'dart:convert'; // Add this import for jsonDecode
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductsScreen extends StatefulWidget {
-  const ProductsScreen({Key? key}) : super(key: key);
+  final VoidCallback onProductsChanged; // Callback to notify changes
+
+  const ProductsScreen({Key? key, required this.onProductsChanged}) : super(key: key);
 
   @override
   _ProductsScreenState createState() => _ProductsScreenState();
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
-  List<Products> products = []; // List to store products
-  bool isGridMode = false; // Flag to toggle between grid and list view
+  List<Products> products = [];
+  bool isGridMode = false;
 
   @override
   void initState() {
     super.initState();
-    _loadSavedProducts(); // Load saved products on screen initialization
+    _loadSavedProducts();
   }
 
   Future<void> _loadSavedProducts() async {
@@ -32,6 +33,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     List<String> productsJson =
         products.map((product) => jsonEncode(product.toJson())).toList();
     await prefs.setStringList('products', productsJson);
+    widget.onProductsChanged(); // Notify changes
   }
 
   @override
@@ -50,6 +52,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ),
         ],
       ),
+      drawer: _buildDrawer(), // Add drawer to ProductsScreen
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         elevation: 10.0,
@@ -61,182 +64,194 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  Widget _buildBody() {
-    if (products.isEmpty) {
-      return Center(
-        child: Text('No items added yet.'),
-      );
-    } else {
-      return isGridMode ? _buildGridView() : _buildListView();
-    }
-  }
-
-  Widget _buildListView() {
-    return ListView.builder(
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return Card(
-          child: ListTile(
-            title: Text(products[index].name),
-            subtitle:
-                Text('\$${products[index].price.toStringAsFixed(2)}'),
-            leading: CircleAvatar(
-              backgroundImage: products[index].picture.isNotEmpty
-                  ? NetworkImage(products[index].picture)
-                  : null,
-              child: products[index].picture.isEmpty
-                  ? Icon(Icons.shopping_bag)
-                  : null,
+  Widget _buildDrawer() {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(84, 179, 44, 0.525),
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    _showEditItemDialog(context, index);
-                  },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                CircleAvatar(
+                  backgroundImage: AssetImage('assets/default_avatar.png'), // Default avatar or replace with user avatar URL
+                  radius: 30,
                 ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    _showDeleteConfirmationDialog(context, index);
-                  },
+                SizedBox(height: 8),
+                Text(
+                  'Juan dela Cruz', // Default name or replace with user name
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),
+          ),
+          ListTile(
+            title: Text('Dashboard'),
+            leading: const Icon(Icons.dashboard),
             onTap: () {
-              _showEditItemDialog(context, index);
+              Navigator.pushReplacementNamed(context, '/dashboard');
             },
           ),
-        );
-      },
+          ListTile(
+            title: Text('Sales'),
+            leading: const Icon(Icons.attach_money),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/sales');
+            },
+          ),
+          ListTile(
+            title: Text('Products'),
+            leading: const Icon(Icons.shopping_bag),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/products');
+            },
+          ),
+          ListTile(
+            title: Text('Account'),
+            leading: const Icon(Icons.people),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/account');
+            },
+          ),
+          ListTile(
+            title: Text('Logout'),
+            leading: const Icon(Icons.logout),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/logout');
+            },
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildGridView() {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 4.0,
-        mainAxisSpacing: 4.0,
-      ),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return Card(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildBody() {
+    if (isGridMode) {
+      return GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          return _buildProductCard(context, index);
+        },
+      );
+    } else {
+      return ListView.builder(
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          return _buildProductTile(context, index);
+        },
+      );
+    }
+  }
+
+  Widget _buildProductCard(BuildContext context, int index) {
+    return Card(
+      child: Column(
+        children: <Widget>[
+          Expanded(
+            child: Image.network(
+              products[index].picture,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Text(products[index].name),
+          Text('\$${products[index].price.toStringAsFixed(2)}'),
+          Row(
             children: <Widget>[
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: products[index].picture.isNotEmpty
-                        ? DecorationImage(
-                            image: NetworkImage(products[index].picture),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                  ),
-                  child: products[index].picture.isEmpty
-                      ? Icon(Icons.shopping_bag)
-                      : null,
-                ),
+              IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () => _showEditItemDialog(context, index),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(products[index].name),
-                    Text('\$${products[index].price.toStringAsFixed(2)}'),
-                  ],
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      _showEditItemDialog(context, index);
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      _showDeleteConfirmationDialog(context, index);
-                    },
-                  ),
-                ],
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () => _showDeleteConfirmationDialog(context, index),
               ),
             ],
           ),
-        );
-      },
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductTile(BuildContext context, int index) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: products[index].picture.isNotEmpty
+            ? NetworkImage(products[index].picture)
+            : null,
+        child: products[index].picture.isEmpty
+            ? Icon(Icons.shopping_bag)
+            : null,
+      ),
+      title: Text(products[index].name),
+      subtitle: Text('\$${products[index].price.toStringAsFixed(2)}'),
+      onTap: () => _showEditItemDialog(context, index),
+      trailing: IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () => _showDeleteConfirmationDialog(context, index),
+      ),
     );
   }
 
   void _showAddItemDialog(BuildContext context) {
-    TextEditingController itemNameController = TextEditingController();
-    TextEditingController itemPriceController = TextEditingController();
-    TextEditingController itemPictureController = TextEditingController();
+    final nameController = TextEditingController();
+    final priceController = TextEditingController();
+    final pictureController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add Item'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                TextField(
-                  controller: itemNameController,
-                  decoration: InputDecoration(labelText: 'Item Name'),
-                ),
-                TextField(
-                  controller: itemPriceController,
-                  decoration: InputDecoration(labelText: 'Item Price'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: itemPictureController,
-                  decoration: InputDecoration(
-                      labelText: 'Item Picture URL (Optional)'),
-                ),
-              ],
-            ),
+          title: const Text('Add Product'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: priceController,
+                decoration: const InputDecoration(labelText: 'Price'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: pictureController,
+                decoration: const InputDecoration(labelText: 'Picture URL'),
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
               onPressed: () {
+                final name = nameController.text;
+                final price = double.tryParse(priceController.text) ?? 0.0;
+                final picture = pictureController.text;
+
+                setState(() {
+                  products.add(Products(name: name, price: price, picture: picture));
+                  _saveProducts(); // Save products after adding
+                });
                 Navigator.of(context).pop();
+                widget.onProductsChanged();
               },
+              child: const Text('Add'),
             ),
             TextButton(
-              child: Text('Add'),
               onPressed: () {
-                String itemName = itemNameController.text;
-                double itemPrice =
-                    double.tryParse(itemPriceController.text) ?? 0.0;
-                String itemPicture = itemPictureController.text;
-
-                // Add item to list
-                setState(() {
-                  products.add(Products(
-                      name: itemName, price: itemPrice, picture: itemPicture));
-                });
-
-                _saveProducts(); // Save products after adding a new one
-
-                // Optionally, show a snackbar or perform any other action
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Item added: $itemName')),
-                );
-
-                // Close the dialog
                 Navigator.of(context).pop();
               },
+              child: const Text('Cancel'),
             ),
           ],
         );
@@ -245,72 +260,54 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   void _showEditItemDialog(BuildContext context, int index) {
-    TextEditingController itemNameController =
-        TextEditingController(text: products[index].name);
-    TextEditingController itemPriceController =
-        TextEditingController(text: products[index].price.toString());
-    TextEditingController itemPictureController =
-        TextEditingController(text: products[index].picture);
+    final nameController = TextEditingController(text: products[index].name);
+    final priceController = TextEditingController(text: products[index].price.toString());
+    final pictureController = TextEditingController(text: products[index].picture);
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Edit Item'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                TextField(
-                  controller: itemNameController,
-                  decoration: InputDecoration(labelText: 'Item Name'),
-                ),
-                TextField(
-                  controller: itemPriceController,
-                  decoration: InputDecoration(labelText: 'Item Price'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: itemPictureController,
-                  decoration: InputDecoration(
-                      labelText: 'Item Picture URL (Optional)'),
-                ),
-              ],
-            ),
+          title: const Text('Edit Product'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: priceController,
+                decoration: const InputDecoration(labelText: 'Price'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: pictureController,
+                decoration: const InputDecoration(labelText: 'Picture URL'),
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
               onPressed: () {
+                final name = nameController.text;
+                final price = double.tryParse(priceController.text) ?? 0.0;
+                final picture = pictureController.text;
+
+                setState(() {
+                  products[index] = Products(name: name, price: price, picture: picture);
+                  _saveProducts(); // Save products after editing
+                });
                 Navigator.of(context).pop();
+                widget.onProductsChanged();
               },
+              child: const Text('Save'),
             ),
             TextButton(
-              child: Text('Save'),
               onPressed: () {
-                String itemName = itemNameController.text;
-                double itemPrice =
-                    double.tryParse(itemPriceController.text) ?? 0.0;
-                String itemPicture = itemPictureController.text;
-
-                // Update item in list
-                setState(() {
-                  products[index] = Products(
-                    name: itemName,
-                    price: itemPrice,
-                    picture: itemPicture,
-                  );
-                });
-
-                _saveProducts(); // Save products after editing
-
-                // Optionally, show a snackbar or perform any other action
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Item edited: $itemName')),
-                );
-
-                // Close the dialog
                 Navigator.of(context).pop();
               },
+              child: const Text('Cancel'),
             ),
           ],
         );
@@ -324,8 +321,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Confirm Delete'),
-          content: Text(
-              'Are you sure you want to delete ${products[index].name}?'),
+          content: Text('Are you sure you want to delete ${products[index].name}?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -334,14 +330,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   _saveProducts(); // Save products after deletion
                 });
                 Navigator.of(context).pop();
+                widget.onProductsChanged();
               },
-              child: Text('Delete'),
+              child: const Text('Delete'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
           ],
         );

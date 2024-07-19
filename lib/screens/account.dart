@@ -70,8 +70,7 @@ class _AccountScreenState extends State<AccountScreen> {
     if (value == null || value.isEmpty) {
       return 'Email is required';
     }
-    String emailRegex =
-        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'; // Basic email regex pattern
+    String emailRegex = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'; // Basic email regex pattern
     RegExp regex = RegExp(emailRegex);
     if (!regex.hasMatch(value)) {
       return 'Enter a valid email address';
@@ -80,54 +79,77 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password is required';
-    }
-    if (value.length < 8) {
-      return 'Password must be at least 8 characters long';
-    }
-    String passwordRegex = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
-    RegExp regex = RegExp(passwordRegex);
-    if (!regex.hasMatch(value)) {
-      return 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+    if (value != null && value.isNotEmpty) {
+      if (value.length < 8) {
+        return 'Password must be at least 8 characters long';
+      }
+      String passwordRegex = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
+      RegExp regex = RegExp(passwordRegex);
+      if (!regex.hasMatch(value)) {
+        return 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+      }
     }
     return null;
   }
 
   String? _validateCurrentPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // No need to validate if empty
+    }
     if (value != currentUser.password) {
       return 'Current password does not match';
     }
     return null;
   }
 
-  void _saveChanges() async {
-    if (_formKey.currentState!.validate()) {
-      // Update currentUser with changes
-      currentUser.name = _nameController.text;
-      currentUser.email = _emailController.text;
-      currentUser.avatarUrl = _avatarUrlController.text;
-      String newPassword = _newPasswordController.text;
-      if (newPassword.isNotEmpty) {
+void _saveChanges() async {
+  if (_formKey.currentState!.validate()) {
+    // Update currentUser with changes
+    currentUser.name = _nameController.text;
+    currentUser.email = _emailController.text;
+    currentUser.avatarUrl = _avatarUrlController.text;
+
+    // Update password only if currentPassword and newPassword are provided and valid
+    String currentPassword = _currentPasswordController.text;
+    String newPassword = _newPasswordController.text;
+
+    if (currentPassword.isNotEmpty && newPassword.isNotEmpty) {
+      if (currentPassword == currentUser.password) {
         currentUser.password = newPassword;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Current password is incorrect')),
+        );
+        return;
       }
-      
-
-      // Save updated details to SharedPreferences (simulated)
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('name', currentUser.name);
-      prefs.setString('email', currentUser.email);
-      // Update password only if newPassword is not empty
-      if (newPassword.isNotEmpty) {
-        prefs.setString('password', currentUser.password);
-      }
-      prefs.setString('avatarUrl', currentUser.avatarUrl);
-
+    } else if (currentPassword.isNotEmpty) {
+      // Current password provided but new password is empty
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Account details updated')),
+        const SnackBar(content: Text('New password is required')),
       );
+      return;
     }
+
+    // Save updated details to SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('name', currentUser.name);
+    prefs.setString('email', currentUser.email);
+    // Update password only if newPassword is not empty
+    if (currentPassword.isNotEmpty && newPassword.isNotEmpty) {
+      prefs.setString('password', currentUser.password);
+    }
+    prefs.setString('avatarUrl', currentUser.avatarUrl);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Account details updated')),
+    );
+
+    // Navigate to the home screen and clear the navigation stack
+    Navigator.pushReplacementNamed(context, '/main');
   }
+}
+
+
 
   void _showAvatarDialog() {
     showDialog(
@@ -140,9 +162,12 @@ class _AccountScreenState extends State<AccountScreen> {
             children: [
               CircleAvatar(
                 radius: 50,
-                backgroundImage: currentUser.avatarUrl.isNotEmpty
-                    ? NetworkImage(currentUser.avatarUrl)
-                    : AssetImage('assets/default_avatar.png') as ImageProvider,
+                backgroundImage: _avatarUrlController.text.isNotEmpty
+                    ? NetworkImage(_avatarUrlController.text)
+                    : const AssetImage('assets/default_avatar.png') as ImageProvider,
+                onBackgroundImageError: (error, stackTrace) {
+                  print('Error loading avatar image: $error');
+                },
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -220,6 +245,9 @@ class _AccountScreenState extends State<AccountScreen> {
                     backgroundImage: currentUser.avatarUrl.isNotEmpty
                         ? NetworkImage(currentUser.avatarUrl)
                         : const AssetImage('assets/default_avatar.png') as ImageProvider,
+                    onBackgroundImageError: (error, stackTrace) {
+                      print('Error loading avatar image: $error');
+                    },
                   ),
                 ),
               ),
