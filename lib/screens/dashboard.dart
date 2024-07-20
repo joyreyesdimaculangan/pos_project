@@ -4,7 +4,7 @@ import 'home.dart'; // Import your HomeScreen
 import 'sales.dart'; // Import other screens as needed
 import 'products.dart'; // Import other screens as needed
 import 'account.dart'; // Import other screens as needed
-import 'login.dart'; // Import your LoginScreen
+
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -51,7 +51,7 @@ class DashboardScreen extends StatelessWidget {
               ),
               leading: const Icon(Icons.home),
               onTap: () {
-              Navigator.pushReplacementNamed(context, '/home');
+                Navigator.pushReplacementNamed(context, '/home');
               },
             ),
             ListTile(

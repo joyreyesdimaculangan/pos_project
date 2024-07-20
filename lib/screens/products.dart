@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductsScreen extends StatefulWidget {
-  final VoidCallback onProductsChanged; // Callback to notify changes
+  final VoidCallback onProductsChanged;
 
   const ProductsScreen({Key? key, required this.onProductsChanged}) : super(key: key);
 
@@ -14,11 +15,23 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen> {
   List<Products> products = [];
   bool isGridMode = false;
+  String currentRoute = '/products'; // Default route
+  String userName = 'Default User'; // Default user name
+  String avatarUrl = 'assets/default_avatar.png'; // Default avatar URL
 
   @override
   void initState() {
     super.initState();
     _loadSavedProducts();
+    _fetchUserDetails();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final route = ModalRoute.of(context)?.settings.name;
+      if (route != null) {
+        setState(() {
+          currentRoute = route;
+        });
+      }
+    });
   }
 
   Future<void> _loadSavedProducts() async {
@@ -36,14 +49,35 @@ class _ProductsScreenState extends State<ProductsScreen> {
     widget.onProductsChanged(); // Notify changes
   }
 
+  Future<void> _fetchUserDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userName = prefs.getString('name') ?? 'Default User';
+      avatarUrl = prefs.getString('avatarUrl') ?? 'assets/default_avatar.png';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Products'),
+        title: Text(
+          'Products',
+          style: GoogleFonts.poppins(
+            textStyle: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        backgroundColor: Colors.green, // Primary color
         actions: <Widget>[
           IconButton(
-            icon: Icon(isGridMode ? Icons.list : Icons.grid_on),
+            icon: Icon(
+              isGridMode ? Icons.list : Icons.grid_on,
+              color: Colors.white,
+            ),
             onPressed: () {
               setState(() {
                 isGridMode = !isGridMode;
@@ -52,11 +86,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ),
         ],
       ),
-      drawer: _buildDrawer(), // Add drawer to ProductsScreen
+      drawer: _buildDrawer(),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.green, // Primary color
         elevation: 10.0,
-        child: const Icon(Icons.add),
+        child: Icon(Icons.add, color: Colors.white),
         onPressed: () {
           _showAddItemDialog(context);
         },
@@ -71,63 +106,85 @@ class _ProductsScreenState extends State<ProductsScreen> {
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Color.fromRGBO(84, 179, 44, 0.525),
+              color: Colors.green, // Primary color
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: <Widget>[
                 CircleAvatar(
-                  backgroundImage: AssetImage('assets/default_avatar.png'), // Default avatar or replace with user avatar URL
+                  backgroundImage: NetworkImage(avatarUrl),
                   radius: 30,
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'Juan dela Cruz', // Default name or replace with user name
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
+                SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    userName, // User name
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                    overflow: TextOverflow.ellipsis, // Ensure text fits
                   ),
                 ),
               ],
             ),
           ),
-          ListTile(
-            title: Text('Dashboard'),
-            leading: const Icon(Icons.dashboard),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/dashboard');
-            },
+          _buildDrawerItem(
+            icon: Icons.dashboard,
+            text: 'Dashboard',
+            routeName: '/dashboard',
           ),
-          ListTile(
-            title: Text('Sales'),
-            leading: const Icon(Icons.attach_money),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/sales');
-            },
+          _buildDrawerItem(
+            icon: Icons.attach_money,
+            text: 'Sales',
+            routeName: '/sales',
           ),
-          ListTile(
-            title: Text('Products'),
-            leading: const Icon(Icons.shopping_bag),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/products');
-            },
+          _buildDrawerItem(
+            icon: Icons.shopping_bag,
+            text: 'Products',
+            routeName: '/products',
           ),
-          ListTile(
-            title: Text('Account'),
-            leading: const Icon(Icons.people),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/account');
-            },
+          _buildDrawerItem(
+            icon: Icons.people,
+            text: 'Account',
+            routeName: '/account',
           ),
-          ListTile(
-            title: Text('Logout'),
-            leading: const Icon(Icons.logout),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/logout');
-            },
+          _buildDrawerItem(
+            icon: Icons.logout,
+            text: 'Logout',
+            routeName: '/logout',
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String text,
+    required String routeName,
+  }) {
+    final bool isActive = currentRoute == routeName;
+
+    return ListTile(
+      leading: Icon(icon, color: Color.fromARGB(255, 55, 56, 55)), // Primary color
+      title: Text(
+        text,
+        style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+            color: isActive ? Colors.white : Colors.black,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+      tileColor: isActive ? const Color.fromARGB(188, 76, 175, 79) : null, // Highlight color
+      onTap: () {
+        Navigator.pushReplacementNamed(context, routeName);
+        setState(() {
+          currentRoute = routeName; // Update current route
+        });
+      },
     );
   }
 
@@ -164,16 +221,39 @@ class _ProductsScreenState extends State<ProductsScreen> {
               fit: BoxFit.cover,
             ),
           ),
-          Text(products[index].name),
-          Text('\$${products[index].price.toStringAsFixed(2)}'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              products[index].name,
+              style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              '\$${products[index].price.toStringAsFixed(2)}',
+              style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                  fontSize: 14,
+                  color: Colors.green, // Accent color
+                ),
+              ),
+            ),
+          ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               IconButton(
-                icon: Icon(Icons.edit),
+                icon: Icon(Icons.edit, color: Colors.green), // Accent color
                 onPressed: () => _showEditItemDialog(context, index),
               ),
               IconButton(
-                icon: Icon(Icons.delete),
+                icon: Icon(Icons.delete, color: Colors.red), // Red for delete
                 onPressed: () => _showDeleteConfirmationDialog(context, index),
               ),
             ],
@@ -190,14 +270,30 @@ class _ProductsScreenState extends State<ProductsScreen> {
             ? NetworkImage(products[index].picture)
             : null,
         child: products[index].picture.isEmpty
-            ? Icon(Icons.shopping_bag)
+            ? Icon(Icons.shopping_bag, color: Colors.green) // Accent color
             : null,
       ),
-      title: Text(products[index].name),
-      subtitle: Text('\$${products[index].price.toStringAsFixed(2)}'),
+      title: Text(
+        products[index].name,
+        style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      subtitle: Text(
+        '\$${products[index].price.toStringAsFixed(2)}',
+        style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.green, // Accent color
+          ),
+        ),
+      ),
       onTap: () => _showEditItemDialog(context, index),
       trailing: IconButton(
-        icon: Icon(Icons.delete),
+        icon: Icon(Icons.delete, color: Colors.red), // Red for delete
         onPressed: () => _showDeleteConfirmationDialog(context, index),
       ),
     );
@@ -212,27 +308,42 @@ class _ProductsScreenState extends State<ProductsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add Product'),
+          title: Text(
+            'Add Product',
+            style: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(labelText: 'Name'),
               ),
               TextField(
                 controller: priceController,
-                decoration: const InputDecoration(labelText: 'Price'),
+                decoration: InputDecoration(labelText: 'Price'),
                 keyboardType: TextInputType.number,
               ),
               TextField(
                 controller: pictureController,
-                decoration: const InputDecoration(labelText: 'Picture URL'),
+                decoration: InputDecoration(labelText: 'Picture URL'),
               ),
             ],
           ),
           actions: <Widget>[
             TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Add'),
               onPressed: () {
                 final name = nameController.text;
                 final price = double.tryParse(priceController.text) ?? 0.0;
@@ -240,18 +351,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                 setState(() {
                   products.add(Products(name: name, price: price, picture: picture));
-                  _saveProducts(); // Save products after adding
+                  _saveProducts();
                 });
-                Navigator.of(context).pop();
-                widget.onProductsChanged();
-              },
-              child: const Text('Add'),
-            ),
-            TextButton(
-              onPressed: () {
+
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
             ),
           ],
         );
@@ -268,46 +372,54 @@ class _ProductsScreenState extends State<ProductsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit Product'),
+          title: Text(
+            'Edit Product',
+            style: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(labelText: 'Name'),
               ),
               TextField(
                 controller: priceController,
-                decoration: const InputDecoration(labelText: 'Price'),
+                decoration: InputDecoration(labelText: 'Price'),
                 keyboardType: TextInputType.number,
               ),
               TextField(
                 controller: pictureController,
-                decoration: const InputDecoration(labelText: 'Picture URL'),
+                decoration: InputDecoration(labelText: 'Picture URL'),
               ),
             ],
           ),
           actions: <Widget>[
             TextButton(
+              child: Text('Cancel'),
               onPressed: () {
-                final name = nameController.text;
-                final price = double.tryParse(priceController.text) ?? 0.0;
-                final picture = pictureController.text;
-
-                setState(() {
-                  products[index] = Products(name: name, price: price, picture: picture);
-                  _saveProducts(); // Save products after editing
-                });
                 Navigator.of(context).pop();
-                widget.onProductsChanged();
               },
-              child: const Text('Save'),
             ),
             TextButton(
+              child: Text('Save'),
               onPressed: () {
+                setState(() {
+                  products[index] = Products(
+                    name: nameController.text,
+                    price: double.tryParse(priceController.text) ?? 0.0,
+                    picture: pictureController.text,
+                  );
+                  _saveProducts();
+                });
+
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
             ),
           ],
         );
@@ -320,25 +432,33 @@ class _ProductsScreenState extends State<ProductsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Delete'),
-          content: Text('Are you sure you want to delete ${products[index].name}?'),
+          title: Text(
+            'Delete Product',
+            style: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          content: Text('Are you sure you want to delete this product?'),
           actions: <Widget>[
             TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
               onPressed: () {
                 setState(() {
                   products.removeAt(index);
-                  _saveProducts(); // Save products after deletion
+                  _saveProducts();
                 });
-                Navigator.of(context).pop();
-                widget.onProductsChanged();
-              },
-              child: const Text('Delete'),
-            ),
-            TextButton(
-              onPressed: () {
+
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
             ),
           ],
         );
@@ -352,7 +472,19 @@ class Products {
   final double price;
   final String picture;
 
-  Products({required this.name, required this.price, this.picture = ''});
+  Products({
+    required this.name,
+    required this.price,
+    required this.picture,
+  });
+
+  factory Products.fromJson(Map<String, dynamic> json) {
+    return Products(
+      name: json['name'],
+      price: json['price'].toDouble(),
+      picture: json['picture'],
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -363,13 +495,6 @@ class Products {
   }
 
   static List<Products> listFromJson(List<String> jsonList) {
-    return jsonList.map((json) {
-      Map<String, dynamic> data = jsonDecode(json);
-      return Products(
-        name: data['name'],
-        price: data['price'],
-        picture: data['picture'],
-      );
-    }).toList();
+    return jsonList.map((json) => Products.fromJson(jsonDecode(json))).toList();
   }
 }

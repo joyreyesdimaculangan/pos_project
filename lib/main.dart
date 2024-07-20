@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         introRoute: (context) => IntroScreen(),
         loginRoute: (context) => const LoginScreen(),
         registerRoute: (context) => const RegisterScreen(),
-        mainRoute: (context) => const MyWidget(),
+        mainRoute: (context) => const HomeScreen(),
         dashboardRoute: (context) => DashboardScreen(),
         salesRoute: (context) => SalesScreen(),
         productsRoute: (context) => ProductsScreen(
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
             // Define what should happen when products change
           },
         ),
-        accountRoute: (context) => AccountScreen(),
+        accountRoute: (context) => const AccountScreen(),
       },
       onGenerateRoute: (settings) {
         // Handle logout route
