@@ -145,7 +145,7 @@ void _saveChanges() async {
     );
 
     // Navigate to the home screen and clear the navigation stack
-    Navigator.pushReplacementNamed(context, '/main');
+    Navigator.pushReplacementNamed(context, '/home');
   }
 }
 

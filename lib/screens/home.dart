@@ -1,8 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'products.dart'; // Ensure this import is correct
+import 'products.dart'; 
+import '../navigations/bottom_bars.dart';
+import '../navigations/custom_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -12,6 +13,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String _currentRoute = '/home'; // Current route to synchronize
+
   String? _avatarUrl;
   String? _userName;
   List<Products> products = []; // Define the products list
@@ -62,6 +65,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _navigateTo(String route) {
+    setState(() {
+      _currentRoute = route;
+    });
+    Navigator.pushReplacementNamed(context, route);
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -97,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(width: 12), // Adjust spacing between avatar and text
                         Expanded(
                           child: Text(
-                            '$_userName!',
+                            'Welcome, $_userName!',
                             style: GoogleFonts.poppins(
                               textStyle: TextStyle(
                                 fontSize: appBarHeight * 0.1, // Adjust text size relative to AppBar height
@@ -265,94 +275,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.green,
-              ),
-              child: Row(
-                children: <Widget>[
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(_avatarUrl ?? ''),
-                    radius: 30,
-                  ),
-                  SizedBox(width: 16), // Space between avatar and name
-                  Expanded(
-                    child: Text(
-                      _userName ?? '',
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              title: Text(
-                'Dashboard',
-                style: GoogleFonts.poppins(color: Colors.black),
-              ),
-              leading: const Icon(Icons.dashboard),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/dashboard');
-              },
-            ),
-            ListTile(
-              title: Text(
-                'Sales',
-                style: GoogleFonts.poppins(color: Colors.black),
-              ),
-              leading: const Icon(Icons.attach_money),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/sales');
-              },
-            ),
-            ListTile(
-              title: Text(
-                'Products',
-                style: GoogleFonts.poppins(color: Colors.black),
-              ),
-              leading: const Icon(Icons.shopping_bag),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProductsScreen(
-                      onProductsChanged: _onProductsChanged,
-                    ),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              title: Text(
-                'Account',
-                style: GoogleFonts.poppins(color: Colors.black),
-              ),
-              leading: const Icon(Icons.people),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/account');
-              },
-            ),
-            ListTile(
-              title: Text(
-                'Logout',
-                style: GoogleFonts.poppins(color: Colors.black),
-              ),
-              leading: const Icon(Icons.logout),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/logout');
-              },
-            ),
-          ],
-        ),
+      drawer: CustomDrawer(
+        currentRoute: _currentRoute,
+        onRouteChanged: _navigateTo,
+      ),
+      bottomNavigationBar: MyBottomNavigationBar(
+        currentRoute: _currentRoute,
       ),
     );
   }

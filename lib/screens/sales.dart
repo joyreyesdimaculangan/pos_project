@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../navigations/bottom_bars.dart'; 
+import '../navigations/custom_drawer.dart';
 
 // Define a class to represent a sales transaction
 class SalesTransaction {
@@ -237,6 +239,12 @@ class _SalesScreenState extends State<SalesScreen> {
           ),
         ],
       ),
+      drawer: CustomDrawer(
+        currentRoute: '/sales',
+        onRouteChanged: (route) {
+          Navigator.pushReplacementNamed(context, route);
+        },
+      ),
       body: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -294,6 +302,7 @@ class _SalesScreenState extends State<SalesScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const MyBottomNavigationBar(currentRoute: '/sales',), // Add the bottom navigation bar here
     );
   }
 }

@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../navigations/custom_drawer.dart';
+import '../navigations/bottom_bars.dart';
 
 class ProductsScreen extends StatefulWidget {
   final VoidCallback onProductsChanged;
@@ -86,8 +88,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ),
         ],
       ),
-      drawer: _buildDrawer(),
+      drawer: CustomDrawer(
+        currentRoute: currentRoute,
+        onRouteChanged: (route) {
+          setState(() {
+            currentRoute = route;
+          });
+        },
+      ),
       body: _buildBody(),
+      bottomNavigationBar: const MyBottomNavigationBar(currentRoute: '/products',), // Add the bottom navigation bar here
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green, // Primary color
         elevation: 10.0,
@@ -96,95 +106,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
           _showAddItemDialog(context);
         },
       ),
-    );
-  }
-
-  Widget _buildDrawer() {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.green, // Primary color
-            ),
-            child: Row(
-              children: <Widget>[
-                CircleAvatar(
-                  backgroundImage: NetworkImage(avatarUrl),
-                  radius: 30,
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    userName, // User name
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                    overflow: TextOverflow.ellipsis, // Ensure text fits
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _buildDrawerItem(
-            icon: Icons.dashboard,
-            text: 'Dashboard',
-            routeName: '/dashboard',
-          ),
-          _buildDrawerItem(
-            icon: Icons.attach_money,
-            text: 'Sales',
-            routeName: '/sales',
-          ),
-          _buildDrawerItem(
-            icon: Icons.shopping_bag,
-            text: 'Products',
-            routeName: '/products',
-          ),
-          _buildDrawerItem(
-            icon: Icons.people,
-            text: 'Account',
-            routeName: '/account',
-          ),
-          _buildDrawerItem(
-            icon: Icons.logout,
-            text: 'Logout',
-            routeName: '/logout',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDrawerItem({
-    required IconData icon,
-    required String text,
-    required String routeName,
-  }) {
-    final bool isActive = currentRoute == routeName;
-
-    return ListTile(
-      leading: Icon(icon, color: Color.fromARGB(255, 55, 56, 55)), // Primary color
-      title: Text(
-        text,
-        style: GoogleFonts.poppins(
-          textStyle: TextStyle(
-            color: isActive ? Colors.white : Colors.black,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-      ),
-      tileColor: isActive ? const Color.fromARGB(188, 76, 175, 79) : null, // Highlight color
-      onTap: () {
-        Navigator.pushReplacementNamed(context, routeName);
-        setState(() {
-          currentRoute = routeName; // Update current route
-        });
-      },
     );
   }
 
@@ -249,11 +170,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               IconButton(
-                icon: Icon(Icons.edit, color: Colors.green), // Accent color
+                icon: Icon(Icons.edit, color: Colors.grey), // Ensure visibility
                 onPressed: () => _showEditItemDialog(context, index),
               ),
               IconButton(
-                icon: Icon(Icons.delete, color: Colors.red), // Red for delete
+                icon: Icon(Icons.delete, color: Colors.grey), // Red for delete
                 onPressed: () => _showDeleteConfirmationDialog(context, index),
               ),
             ],
@@ -292,9 +213,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
         ),
       ),
       onTap: () => _showEditItemDialog(context, index),
-      trailing: IconButton(
-        icon: Icon(Icons.delete, color: Colors.red), // Red for delete
-        onPressed: () => _showDeleteConfirmationDialog(context, index),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.edit, color: Colors.grey), // Ensure visibility
+            onPressed: () => _showEditItemDialog(context, index),
+          ),
+          IconButton(
+            icon: Icon(Icons.delete, color: Colors.grey), // Red for delete
+            onPressed: () => _showDeleteConfirmationDialog(context, index),
+          ),
+        ],
       ),
     );
   }
@@ -409,12 +339,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
             TextButton(
               child: Text('Save'),
               onPressed: () {
+                final name = nameController.text;
+                final price = double.tryParse(priceController.text) ?? 0.0;
+                final picture = pictureController.text;
+
                 setState(() {
-                  products[index] = Products(
-                    name: nameController.text,
-                    price: double.tryParse(priceController.text) ?? 0.0,
-                    picture: pictureController.text,
-                  );
+                  products[index] = Products(name: name, price: price, picture: picture);
                   _saveProducts();
                 });
 
@@ -472,16 +402,12 @@ class Products {
   final double price;
   final String picture;
 
-  Products({
-    required this.name,
-    required this.price,
-    required this.picture,
-  });
+  Products({required this.name, required this.price, required this.picture});
 
   factory Products.fromJson(Map<String, dynamic> json) {
     return Products(
       name: json['name'],
-      price: json['price'].toDouble(),
+      price: json['price'],
       picture: json['picture'],
     );
   }
@@ -495,6 +421,6 @@ class Products {
   }
 
   static List<Products> listFromJson(List<String> jsonList) {
-    return jsonList.map((json) => Products.fromJson(jsonDecode(json))).toList();
+    return jsonList.map((jsonStr) => Products.fromJson(jsonDecode(jsonStr))).toList();
   }
 }

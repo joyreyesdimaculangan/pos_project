@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   static const String introRoute = '/intro';
   static const String loginRoute = '/login';
   static const String registerRoute = '/register';
-  static const String mainRoute = '/main';
+  static const String homeRoute = '/home';
   static const String dashboardRoute = '/dashboard';
   static const String salesRoute = '/sales';
   static const String productsRoute = '/products';
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         introRoute: (context) => IntroScreen(),
         loginRoute: (context) => const LoginScreen(),
         registerRoute: (context) => const RegisterScreen(),
-        mainRoute: (context) => const HomeScreen(),
+        homeRoute: (context) => const HomeScreen(), 
         dashboardRoute: (context) => DashboardScreen(),
         salesRoute: (context) => SalesScreen(),
         productsRoute: (context) => ProductsScreen(

@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if ((input == storedUsername || input == storedEmail) && password == storedPassword) {
       // Navigate to main screen or perform other actions upon successful login
-      Navigator.pushReplacementNamed(context, MyApp.mainRoute);
+      Navigator.pushReplacementNamed(context, MyApp.homeRoute);
     } else {
       // Handle failed login attempt
       setState(() {
