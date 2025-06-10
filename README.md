@@ -1,2 +1,2 @@
-# pos_project
- An application for a POS dashboard for the final requirement in the course Application Development
+# Point-of-Sales Dashboard
+ An Point-of-Sales Dashboard using Dart
